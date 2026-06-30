@@ -1,41 +1,26 @@
-const URL = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=eur,usd";
+import {fetchMarkets, fetchPrices} from "./lib/api.js";
+import {sortByChange} from "./lib/transform.js";
+import {printCoin} from "./lib/display.js";
 
-async function main() {
-    try{
-        const response = await fetch(URL);
-        if (!response.ok) {
-            throw new Error("Fehler: " + response.statusText);
+const COINS = ["bitcoin", "ethereum", "solana"];
+const CURRENCIES = ["eur", "usd"];
+
+
+async function main(){
+    try {
+        const markets = await fetchMarkets(COINS,"eur");
+        console.log("Unsortiert:\n");
+        markets.forEach(printCoin);
+
+        const sortedByChange = sortByChange(markets, "desc");
+        console.log("\nSortiert nach 24h Aenderung:\n");
+        sortedByChange.forEach(printCoin);
+
+    }catch(error){
+        console.error("Fehler beim Abrufen der Preise:", error.message);
+        process.exit(1);
         }
+    }
 
-        const data = await response.json();
-
-        Object.entries(data).forEach(([name, prices]) => {
-            const priceEUR = new Intl.NumberFormat("de-DE", {
-                style: "currency",
-                currency: "EUR",
-            }).format(prices.eur);
-            console.log(name + ": " + priceEUR);
-
-            const priceUSD = new Intl.NumberFormat("de-DE", {
-                style: "currency",
-                currency: "USD",
-            }).format(prices.usd);
-            console.log(name + ": " + priceUSD);
-        });
-
-        // const priceEUR = new Intl.NumberFormat("de-DE", {
-        //     style: "currency",
-        //     currency: "EUR",
-        // }).format(data.bitcoin.eur);
-        // const priceUSD = new Intl.NumberFormat("de-DE", {
-        //     style: "currency",
-        //     currency: "USD",
-        // }).format(data.bitcoin.usd)
-        //
-        // console.log("Bitcoin In EUR: " + priceEUR);
-        // console.log("Bitcoin in USD: " + priceUSD);
-    } catch (error) {
-        console.log("Fehler: " + error.message);}
-}
 
 main();
