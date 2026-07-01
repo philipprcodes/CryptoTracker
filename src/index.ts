@@ -8,10 +8,10 @@ const COINS = ["bitcoin", "ethereum", "solana","ripple","dogecoin"];
 async function main(){
     try {
         const markets = await fetchMarkets(COINS,"eur");
-        console.log("==============================")
+        console.log("================================")
         console.log("Unsortiert:");
         markets.forEach(printCoin);
-        console.log("==============================")
+        console.log("================================")
         const sortedByChange: Coin[] = sortByChange(markets, "desc");
         console.log("Sortiert nach 24h Aenderung:");
         sortedByChange.forEach(printCoin);
@@ -19,7 +19,7 @@ async function main(){
         const topGainer = sortedByChange[0];
         const topLoser = sortedByChange[sortedByChange.length - 1];
         if (topGainer && topLoser) {
-            console.log("==============================")
+            console.log("================================")
             console.log("Top Gainer:");
             printCoin(topGainer);
             console.log("Top Loser:");
