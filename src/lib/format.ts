@@ -1,4 +1,6 @@
-export function formatCurrency(amount, currency) {
+import type {Currency} from "./types";
+
+export function formatCurrency(amount: number, currency: Currency): string {
     const locales = { eur: "de-DE", usd: "en-US" };
     return new Intl.NumberFormat(locales[currency] || "en-US", {
         style: "currency",
@@ -6,10 +8,9 @@ export function formatCurrency(amount, currency) {
     }).format(amount);
 }
 
-export function formatPercentage(value) {
+export function formatPercentage(value: number): string {
     const percentageSign = value > 0 ? "+" : "";
-    value = value.toFixed(2);
-    const text = `${percentageSign}${value}%`;
+    const text = `${percentageSign}${value.toFixed(2)}%`;
 
     const green = "\x1b[32m";
     const red = "\x1b[31m";
@@ -19,7 +20,7 @@ export function formatPercentage(value) {
     return `${colour}${text}${reset}`;
 }
 
-export function formatToUpercase(coin) {
-    const formattedCoin = coin.charAt(0).toUpperCase() + coin.slice(1);
+export function formatToUpercase(coin: string): string {
+    const formattedCoin: string = coin.charAt(0).toUpperCase() + coin.slice(1);
     return formattedCoin;
 }
