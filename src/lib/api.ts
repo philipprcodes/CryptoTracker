@@ -1,4 +1,4 @@
-import type {Coin, Currency} from "./types.js";
+import type {ApiResult, Coin, Currency} from "./types.js";
 import {isCoin} from "./guards.js";
 
 function buildUrl(coins: string[], currencies: Currency[]): string {
@@ -29,17 +29,17 @@ export async function fetchPrices(coins: string[], currencies: Currency[]) : Pro
     return response.json();
 }
 
-export async function fetchMarkets(coins: string[], currency: Currency) : Promise<Coin[]> {
+export async function fetchMarkets(coins: string[], currency: Currency = "eur") : Promise<ApiResult<Coin[]>> {
     const url = buildMarketURL(coins, currency);
     const response = await fetch(url);
     if (!response.ok) {
-        throw new Error(`API antwortete mit Status ${response.status}`);
+        return { ok: false, error: `API antwortete mit Status ${response.status}` };
     }
     const data: unknown = await response.json();
     // Narrowing: unknown -> unknown[] -> Coin[]
     if (!Array.isArray(data) || !data.every(isCoin)){
         throw new Error("Could not find coin");
     }
-    return data;
+    return { ok: true, data};
 }
 

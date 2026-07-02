@@ -1,11 +1,17 @@
 export interface Coin {
-    id: string;
-    symbol: string;
-    name: string;
-    current_price: number;
-    price_change_percentage_24h: number;
+    readonly id: string;
+    readonly symbol: string;
+    readonly name: string;
+    readonly current_price: number;
+    readonly price_change_percentage_24h: number;
 }
+
+export type ApiResult<T> =
+    { ok: true; data: T}
+    | { ok: false; error: string };
 
 export type Currency = "eur" | "usd";
 
 export type SortOrder = "asc" | "desc";
+
+export type SupportedCoin = "bitcoin" | "ethereum" | "solana" | "cardano" | "dogecoin";
