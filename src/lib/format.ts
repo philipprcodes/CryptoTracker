@@ -1,6 +1,6 @@
 import type {Currency} from "./types";
 
-export function formatCurrency(amount: number, currency: Currency): string {
+export function formatCurrency(amount: number, currency: Currency = "eur"): string {
     const locales = { eur: "de-DE", usd: "en-US" };
     return new Intl.NumberFormat(locales[currency] || "en-US", {
         style: "currency",
