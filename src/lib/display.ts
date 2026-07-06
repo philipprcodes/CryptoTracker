@@ -1,6 +1,7 @@
 import {formatCurrency, formatPercentage} from "./format";
 import type {Coin, Currency} from "./types";
 import type {Portfolio} from "../domain/portfolio";
+import {getHoldings, getValue} from "../domain/portfolio";
 
 export function printCoin(coin: Coin, curr : Currency): void {
     const formattedCoin = coin.name;
@@ -17,7 +18,7 @@ export function printCoinInPortfolio(coin: Coin, amount: number, curr : Currency
 }
 
 export function printPortfolio(markets: Coin[], portfolio: Portfolio, curr : Currency = "eur"): void {
-    portfolio.getHoldings().forEach((amount, coinId) => {
+    Object.entries(getHoldings(portfolio)).forEach(([coinId, amount]) => {
         const coin = markets.find(c => c.id === coinId);
         if (!coin) return;
     const formattedCoin = coin.name;
@@ -26,5 +27,5 @@ export function printPortfolio(markets: Coin[], portfolio: Portfolio, curr : Cur
     console.log(`${formattedCoin.padEnd(9)}: ${formattedAmount.padStart(5)} Stück -> ${formattedPrice.padStart(12)}`);
     });
     console.log("====================================")
-    console.log("Portfolio Gesamtwert: " + formatCurrency(portfolio.getValue(markets)).padStart(16));
+    console.log("Portfolio Gesamtwert: " + formatCurrency(getValue(portfolio,markets)).padStart(16));
 }

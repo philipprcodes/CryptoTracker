@@ -3,7 +3,7 @@ import {sortByChange} from "./lib/transform";
 import {printCoin, printCoinInPortfolio, printPortfolio} from "./lib/display";
 import type {ApiResult, Coin, Currency, SupportedCoin} from "./lib/types";
 import {isApiError} from "./lib/guards";
-import {Portfolio} from "./domain/portfolio";
+import {emptyPortfolio, buy, sell, getValue, type Portfolio} from "./domain/portfolio";
 import {formatCurrency} from "./lib/format";
 
 const COINS : SupportedCoin[] = ["bitcoin", "ethereum", "solana", "cardano", "dogecoin"];
@@ -40,12 +40,23 @@ async function main(): Promise<void> {
 
     console.log("================================")
     console.log("Portfolio:");
-    const portfolio = new Portfolio();
-    portfolio.buy("bitcoin", 0.5);
-    portfolio.buy("ethereum", 2);
-    portfolio.buy("solana", 10);
-    portfolio.buy("cardano", 500);
-    portfolio.buy("dogecoin", 1000);
+    const history: Portfolio[] = [];
+    let portfolio = emptyPortfolio;
+    history.push(portfolio);
+    portfolio = buy(portfolio, "bitcoin", 0.5);
+    history.push(portfolio);
+    portfolio = buy(portfolio,"ethereum", 2);
+    history.push(portfolio);
+    portfolio = buy(portfolio,"solana", 10);
+    history.push(portfolio);
+    portfolio = buy(portfolio,"cardano", 500);
+    history.push(portfolio);
+    portfolio = buy(portfolio,"dogecoin", 1000);
+    history.push(portfolio);
+    portfolio = sell(portfolio,"dogecoin", 700);
+    history.push(portfolio);
+    portfolio = sell(portfolio,"cardano", 200);
+    history.push(portfolio);
 
     printPortfolio(markets,portfolio);
 }
