@@ -1,5 +1,5 @@
-import type {ApiResult, Coin, Currency} from "./types.js";
-import {isCoin} from "./guards.js";
+import type {ApiResult, Coin, Currency, HistoricalPrice} from "./types.js";
+import {isCoin, isPriceArray} from "./guards.js";
 
 function buildUrl(coins: string[], currencies: Currency[]): string {
     const params = new URLSearchParams({
@@ -43,3 +43,46 @@ export async function fetchMarkets(coins: string[], currency: Currency = "eur") 
     return { ok: true, data};
 }
 
+export async function fetchHistory(coinId: string, days: number): Promise<ApiResult<HistoricalPrice[]>> {
+    const url = `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=eur&days=${days}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        return { ok: false, error: `API Fehler ${response.status} für ${coinId}` };
+    }
+
+    const data: unknown = await response.json();
+
+    if (!isPriceArray(data)) {
+        return { ok: false, error: "Ungültige API Antwort" };
+    }
+
+    const prices: HistoricalPrice[] = data.prices.map(
+        ([timestamp, price]) => ({ timestamp, price })
+    );
+
+    return { ok: true, data: prices };
+}
+
+
+
+export async function fetchAllHistories( coinIds: string[], days: number): Promise<ApiResult<Record<string, HistoricalPrice[]>>>{
+
+    const results = await Promise.all(
+        coinIds.map(coinId => fetchHistory(coinId, days))
+    );
+    const histories: Record<string, HistoricalPrice[]> = {};
+
+    for (const [index, result] of results.entries()) {
+        const coinId = coinIds[index];
+        if (!coinId) continue;
+
+        if (!result.ok) {
+            return { ok: false, error: result.error };
+        }
+
+        histories[coinId] = result.data;
+    }
+
+    return { ok: true, data: histories };
+}

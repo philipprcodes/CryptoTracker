@@ -6,6 +6,11 @@ export interface Coin {
     readonly price_change_percentage_24h: number;
 }
 
+export interface HistoricalPrice {
+    timestamp: number;
+    price: number;
+}
+
 export type ApiResult<T> =
     { ok: true; data: T}
     | { ok: false; error: string };

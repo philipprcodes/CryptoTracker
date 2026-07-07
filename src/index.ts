@@ -1,6 +1,6 @@
-import {fetchMarkets, fetchPrices} from "./lib/api";
+import {fetchAllHistories, fetchMarkets, fetchPrices} from "./lib/api";
 import {sortByChange} from "./lib/transform";
-import {printCoin, printCoinInPortfolio, printPortfolio} from "./lib/display";
+import {printCoin, printCoinAverage, printCoinInPortfolio, printPortfolio} from "./lib/display";
 import type {ApiResult, Coin, Currency, SupportedCoin} from "./lib/types";
 import {isApiError} from "./lib/guards";
 import {emptyPortfolio, buy, sell, getValue, type Portfolio} from "./domain/portfolio";
@@ -58,6 +58,18 @@ async function main(): Promise<void> {
     portfolio = sell(portfolio,"cardano", 200);
     history.push(portfolio);
 
+
     printPortfolio(markets,portfolio);
+    const historiesResult = await fetchAllHistories(COINS, 7);
+    if (!isApiError(historiesResult)) {
+        console.log("================================");
+        console.log("Durchschnittspreis letzte 7 Tage:");
+
+        Object.entries(historiesResult.data).forEach(([coinId, history]) => {
+            const coin = markets.find(c => c.id === coinId);
+            if (!coin) return;
+            printCoinAverage(coin, history, curr);
+        });
+    }
 }
 main();

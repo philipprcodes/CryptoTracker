@@ -1,7 +1,8 @@
 import {formatCurrency, formatPercentage} from "./format";
-import type {Coin, Currency} from "./types";
+import type {Coin, Currency, HistoricalPrice} from "./types";
 import type {Portfolio} from "../domain/portfolio";
 import {getHoldings, getValue} from "../domain/portfolio";
+import {averagePrice} from "./transform";
 
 export function printCoin(coin: Coin, curr : Currency): void {
     const formattedCoin = coin.name;
@@ -28,4 +29,13 @@ export function printPortfolio(markets: Coin[], portfolio: Portfolio, curr : Cur
     });
     console.log("====================================")
     console.log("Portfolio Gesamtwert: " + formatCurrency(getValue(portfolio,markets)).padStart(16));
+}
+
+export function printCoinAverage(coin: Coin, history: HistoricalPrice[], curr: Currency = "eur"): void {
+    const avg = averagePrice(history);
+    const formattedAvg = formatCurrency(avg, curr);
+    const formattedCurrent = formatCurrency(coin.current_price, curr);
+    console.log(
+        `${coin.name.padEnd(10)} Ø ${formattedAvg.padStart(15)}  (aktuell: ${formattedCurrent})`
+    );
 }
